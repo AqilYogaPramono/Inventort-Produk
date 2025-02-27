@@ -1,10 +1,9 @@
 const connection = require('../config/database')
 
-class kategoriModel {
-//digunakan unruk menampilakn seluruh isi dari tabel kategori
+class Model_Produk {
     static async getAll() {
         return new Promise((resolve, reject) => {
-            connection.query(`select * from kategori`, (err, rows) => {
+            connection.query(`select produk.produk_id, produk.nama_produk, produk.gambar_produk, kategori.nama_kategori from produk inner join kategori on produk.id_kategori = kategori.kategori_id`, (err, rows) => {
                     if (err) {
                         reject(err)
                     } else {
@@ -15,24 +14,9 @@ class kategoriModel {
         })
     }
 
-//digunakan untuk menambahkan data pada tabel kategori
-    static async Store(data) {
-        return new Promise((resolve, reject) => {
-            connection.query(`insert into kategori set ?`, data, (err, result) => {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve(result)
-                    }
-                }
-            )
-        })
-    }
-
-//digunakan untuk menampilkan kategori berdasarkan id yang di inginkan
     static async getId(id) {
         return new Promise((resolve, reject) => {
-            connection.query(`select * from kategori where id_kategoti = `, + id, (err, result) => {
+            connection.query(`select * from produk a left join kategori b on b.kategori_id=a.id_kategori where a.produk_id = ?`, id, (err, result) => {
                     if (err) {
                         reject(err)
                     } else {
@@ -43,10 +27,9 @@ class kategoriModel {
         })
     }
 
-//digunkan untuk update data di tabel kategori berdasarkan kategori_id yang di inputkan
-    static async update(id, data) {
+    static async store(data) {
         return new Promise((resolve, reject) => {
-            connection.query(`update kategori set ? where kategori_id = ?`, [data, id], (err, result) => {
+            connection.query(`insert into produk set ?`, data, (err, result) => {
                     if (err) {
                         reject(err)
                     } else {
@@ -57,10 +40,22 @@ class kategoriModel {
         })
     }
 
-//digunakan untuk melakukan delete pada tabel kategori berdasarkan kategori_id
+    static async update(data, id) {
+        return new Promise((resolve, reject) => {
+            connection.query(`update produk set ? where produk_id = ?`, [data, id], (err, result) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(result)
+                    }
+                }
+            )
+        })
+    }
+
     static async delete(id) {
         return new Promise((resolve, reject) => {
-            connection.query(`delete from kategori where kategori_id = ? `,  [id], (err, result) => {
+            connection.query(`delete from produk where produk_id = ?`, id, (err, result) => {
                     if (err) {
                         reject(err)
                     } else {
@@ -72,4 +67,4 @@ class kategoriModel {
     }
 }
 
-module.exports = kategoriModel
+module.exports = Model_Produk
