@@ -1,9 +1,10 @@
 var express = require('express')
 var router = express.Router()
 const kategoriModel = require('../model/kategoriModel')
+const verifyToken = require('../config/middleware/jwt')
 
 //Menampilkan semua data kategori dari database menggunakan kategoriModel.getAll()
-router.get('/', async (req, res, next) => {
+router.get('/',verifyToken, async (req, res, next) => {
     try {
         let rows = await kategoriModel.getAll()
         return res.status(200).json(rows)

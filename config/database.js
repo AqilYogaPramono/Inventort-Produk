@@ -1,5 +1,4 @@
 let mysql = require('mysql')
-require('dotenv').config()
 
 let connection = mysql.createConnection({
     host: process.env.DB_HOST,
