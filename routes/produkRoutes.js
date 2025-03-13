@@ -6,6 +6,7 @@ const fs = require('fs')
 const multer = require('multer')
 const path = require('path')
 
+//Digunakn untuk meguploud file
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/images')
@@ -16,6 +17,7 @@ const storage = multer.diskStorage({
     }
 })
 
+//digunkana untuk mengfilter gambar saja yang bisa di uploud
 const fileFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
         return cb(null, true)
@@ -23,9 +25,12 @@ const fileFilter = (req, file, cb) => {
     return cb(new Error('Only Image files are allowed'), false)
 }
 
+//digunakan untuk melimit uploud gambar agar hanya berukuran max 1MB
 const limits = { fileSize: 1 * 1024 * 1024 }
+
 const upload = multer({storage: storage, limits, fileFilter})
 
+//Menampilkan semua data produk dari database menggunakan produkModel.getAll()
 router.get('/', async (req, res, next) => {
     try {
         let rows = await produkModel.getAll()
@@ -35,6 +40,7 @@ router.get('/', async (req, res, next) => {
     }
 })
 
+//Menampilkan data produk dari database menggunakan produkModel.getId(id)
 router.get('/:id', async (req, res, next) => {
     let id = req.params.id
     try {
@@ -46,6 +52,7 @@ router.get('/:id', async (req, res, next) => {
     }
 })
 
+//menambahkan data lalu disimpan ke database dengan produkModel.Store(data).
 router.post('/store', upload.single("gambar_produk"), async (req, res, next) => {
     let { nama_produk, id_kategori } = req.body
     console.log(req.body)
@@ -66,6 +73,7 @@ router.post('/store', upload.single("gambar_produk"), async (req, res, next) => 
     }
 })
 
+//menggunkaan id lalu memanggil produkModel.update(id, data) untuk mengupdate produk di database.
 router.patch('/update/:id', upload.single("gambar_produk"), async (req, res, next) =>  {
     let id = req.params.id
     let { nama_produk, id_kategori } = req.body
@@ -101,6 +109,7 @@ router.patch('/update/:id', upload.single("gambar_produk"), async (req, res, nex
     }
 })
 
+//Menggunakan id lalu memanggil produkModel.delete(id) untuk menghapus produk dari database.
 router.delete('/delete/:id', async (req, res, next) => {
     let id = req.params.id
 
