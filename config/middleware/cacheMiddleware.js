@@ -1,5 +1,5 @@
 const Redis = require('ioredis')
-const redis = new Redis({ host: '127.22.30.5', port: 6379})
+const redis = new Redis({ host: '172.26.166.13', port: 6379})
 
 redis.ping((err, result) => {
     if (err) {

@@ -127,7 +127,7 @@ static async login(username, password) {
                     username: user.username
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: '1h' }
+                { expiresIn: '1000d' }
             );
 
             resolve({ token });
