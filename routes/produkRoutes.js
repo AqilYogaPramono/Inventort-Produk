@@ -5,6 +5,8 @@ const produkModel = require('../model/produkModel')
 const fs = require('fs')
 const multer = require('multer')
 const path = require('path')
+const nodeCache = require('node-cache')
+const cache = new nodeCache({ stdTTL: 60 })
 
 //Digunakn untuk meguploud file
 const storage = multer.diskStorage({
@@ -33,6 +35,16 @@ const upload = multer({storage: storage, limits, fileFilter})
 //Menampilkan semua data produk dari database menggunakan produkModel.getAll()
 router.get('/', async (req, res, next) => {
     try {
+        const cacheKey = 'all_product'
+        let cacheData = cache.get(cacheKey)
+
+        if (cacheKey) {
+            return res.status(200).json({
+                status: true,
+                message: 'Data produk (cache)',
+                data: cacheData
+            })
+        }
         let rows = await produkModel.getAll()
         return res.status(200).json(rows)
     } catch (error) {
