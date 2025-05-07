@@ -1,9 +1,10 @@
 var express = require('express')
 var router = express.Router()
 const usersModel = require('../../model/usersModel')
+const limiter = require('../../config/middleware/ratelimiter')
 
 //digunakan untuk melakukan login berdasarkan username dan password dan setelah berhgasil akan menghasilkan token
-router.post('/', async (req, res) => {
+router.post('/', limiter ,async (req, res) => {
     const { username, password} = req.body
     if (!username) {
         return res.status(400).json({ message: 'Username harus di isi'})
