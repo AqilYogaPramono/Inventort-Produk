@@ -3,12 +3,14 @@ var router = express.Router()
 const kategoriModel = require('../model/kategoriModel')
 const verifyToken = require('../config/middleware/jwt')
 const cacheMiddleware = require('../config/middleware/cacheMiddleware')
+const { kategoriQueue } = require('../jobs/worker')
 
 //Menampilkan semua data kategori dari database menggunakan kategoriModel.getAll()
-router.get('/',verifyToken, cacheMiddleware, async (req, res, next) => {
+router.get('/', cacheMiddleware, async (req, res, next) => {
     try {
-        let rows = await kategoriModel.getAll()
-        return res.status(200).json(rows)
+        const job = await kategoriQueue.add({action: 'get'})
+        const result = await  job.finished()
+        return res.status(200).json(result.data)
     } catch (error) {
         res.status(500).json({message: error.message})
     }
@@ -19,7 +21,8 @@ router.post('/store', async (req, res, next) => {
     let {nama_kategori} = req.body
     let data = { nama_kategori }
     try {
-        await kategoriModel.Store(data)
+        const job = await kategoriQueue.add({ action: 'store', data})
+        await job.finished()
         res.status(201).json({message: 'ok'})
     } catch (error) {
         res.status(500).json({message: error.message})
@@ -27,13 +30,13 @@ router.post('/store', async (req, res, next) => {
 })
 
 //menggunkaan id dan nama_kategori lalu memanggil kategoriModel.update(id, data) untuk mengupdate kategori di database.
-router.put('/update/:id', async (req, res, next) => {
+router.patch('/update/:id', async (req, res, next) => {
     let id = req.params.id
     let {nama_kategori} = req.body
     let data = { nama_kategori }
     try {
-        await kategoriModel.update(id, data)
-        console.log(data)
+        const job = await kategoriQueue.add({ action: 'update', data})
+        await job.finished()
         return res.status(201).json({message: 'ok'})
     } catch (error) {
         res.status(500).json({message: error.message})
@@ -44,7 +47,8 @@ router.put('/update/:id', async (req, res, next) => {
 router.delete('/delete/:id', async (req, res, next) => {
     let id = req.params.id
     try {
-        await kategoriModel.delete(id)
+        const job = await kategoriQueue.add({ action: 'delete', id})
+        await job.finished()
         return res.status(201).json({message: 'ok'})
     } catch (error) {
         res.status(500).json({message: error.message})
