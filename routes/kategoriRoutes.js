@@ -4,13 +4,17 @@ const kategoriModel = require('../model/kategoriModel')
 const verifyToken = require('../config/middleware/jwt')
 const cacheMiddleware = require('../config/middleware/cacheMiddleware')
 const { kategoriQueue } = require('../jobs/worker')
+const { encryptData, decryptData } = require('../config/middleware/crypto')
 
 //Menampilkan semua data kategori dari database menggunakan kategoriModel.getAll()
 router.get('/', cacheMiddleware, async (req, res, next) => {
     try {
         const job = await kategoriQueue.add({action: 'get'})
         const result = await  job.finished()
-        return res.status(200).json(result.data)
+        const encrypt = await encryptData(result.data)
+
+        const decrypt = await decryptData(encrypt)
+        return res.status(200).json({ data: encrypt, dataasli: decrypt})
     } catch (error) {
         res.status(500).json({message: error.message})
     }
