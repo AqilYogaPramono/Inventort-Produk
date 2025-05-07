@@ -5,9 +5,11 @@ const verifyToken = require('../config/middleware/jwt')
 const cacheMiddleware = require('../config/middleware/cacheMiddleware')
 const { kategoriQueue } = require('../jobs/worker')
 const { encryptData, decryptData } = require('../config/middleware/crypto')
+const limit = require('../config/middleware/ratelimiter')
+const limiter = require('../config/middleware/ratelimiter')
 
 //Menampilkan semua data kategori dari database menggunakan kategoriModel.getAll()
-router.get('/', cacheMiddleware, async (req, res, next) => {
+router.get('/', limiter,cacheMiddleware, async (req, res, next) => {
     try {
         const job = await kategoriQueue.add({action: 'get'})
         const result = await  job.finished()
